@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+<style>
+*{
+	margin: 0;
+	padding: 0;
+}
+.warp{
+	perspective:1000px;
+}
+img{
+	vertical-align:middle;
+	width:80px;
+	height: 80px;
+	opacity:1;
+}
+#div{
+	transform-style: preserve-3d;
+    width: 640px;
+    height: 480px;
+    margin: 10px auto;
+}
+</style>
+</head>
+<body>
+	<div class="warp">
+		<div id="div"></div>
+	</div>
+<script type="text/javascript">
+	/*
+		1.随机缩小，淡出
+		2.淡入放大
+		3.淡出 - > 随机排列位置
+		4.环绕回位
+		
+		48张图片
+		
+			x ~ y : Math.round(Math.random()*(y-x) + x)
+			0 ~ x : Math.round(Math.random()*x)
+			1 ~ x : Math.ceil(Math.random()*x)||1
+			0 ~ x-1 : Math.floor(Math.random()*x)
+
+		
+	*/
+	
+	for(var i=1;i<=48;i++){
+		var img = document.createElement('img');
+		if(i > 30){
+			img.src = 'img/'+((i%30)+1)+'.jpg';
+		}else{
+			img.src = 'img/'+i+'.jpg';
+		}
+		div.appendChild(img);
+	}
+	
+	var imgs = document.querySelectorAll('img');
+	var num = 0;
+	document.onclick = function(){
+		for(var i=0;i<imgs.length;i++){
+			setTimeout(function(i){
+				
+				move(imgs[i],'.5s',{
+					transform:'scale(0)'
+				},function(obj){
+					move(obj,'1s',{
+						opacity:0,
+						transform:'scale(1)'
+						
+					},function(obj){
+						var r = Math.random()*(100-40)+1+40;
+						var zf = Math.random()-0.5>0?r:-r;
+						move(obj,'1.5s',{
+							transform:'rotateY(0deg) translateZ(-300px)',
+							transformOrigin:zf+'px'
+						},function(obj){
+							setTimeout(function(){
+								obj.style.transform = 'rotateY(-360deg) translateZ(0px)';
+								obj.style.opacity = 1;
+							},1800);
+						});
+					});
+				})
+			},Math.random()*(800-30)+1+30,i)//随机
+		}
+	}
+	
+	
+	function move(obj,time,json,callback){
+		obj.onOff = true;//解决操作多个样式的时候transitionend会触发多次，只执行一次
+		obj.style.transition = time;
+		for(var attr in json){
+			obj.style[attr] = json[attr];
+		}
+		/*
+			transitionend：
+				当某个对象的运动结束之后就会触发，操作多少个，就会触发多少次
+		*/
+		obj.addEventListener('transitionend',function(){
+			if(obj.onOff){
+				obj.onOff = false;
+				callback && callback(obj);
+			}
+		})
+		
+	}
+	
+	
+	
+	
+	
+</script>
+</body>
+</html>
